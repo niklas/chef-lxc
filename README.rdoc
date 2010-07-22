@@ -1,0 +1,15 @@
+= DESCRIPTION:
+Creates RootFS for virtual machines used by LXC (Linux Containers)
+
+= REQUIREMENTS:
+* debootstrap
+* ...
+
+= ATTRIBUTES: 
+
+= USAGE:
+
+Create a databag called +virtual_machines+ and create machines there. 
+
+Details following..
+
