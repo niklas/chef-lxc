@@ -38,7 +38,7 @@ search(:virtual_machines) do |guest|
   variant = guest[:variant] ||= host[:default][:variant]
   suite   = guest[:suite  ] ||= host[:default][:suite  ]
   mirror  = guest[:mirror ] ||= host[:default][:mirror ]
-  guest[:ip4v] ||= host[:default][:ipv4]
+  guest[:ipv4] ||= host[:default][:ipv4]
   rootfs  = host[:base_directory] / hostname + '.rootfs'
 
   execute "debootstrap" do
