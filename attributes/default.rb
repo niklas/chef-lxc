@@ -5,6 +5,11 @@ set_unless[:container] = {
     :domain => "vm.local", 
     :variant => 'minbase',
     :suite => 'lucid',
-    :mirror => ''
+    :mirror => '',
+    :ipv4 => {
+      :address => '192.168.168.100',
+      :mask    => '255.255.255.0',
+      :gateway => '192.168.168.1'
+    }
   }
 }
