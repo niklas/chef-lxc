@@ -1,0 +1,29 @@
+{
+    "providing": {
+    },
+    "description": "Installs/Configures lxc",
+    "replacing": {
+    },
+    "attributes": {
+    },
+    "groupings": {
+    },
+    "dependencies": {
+    },
+    "long_description": "= DESCRIPTION:\nCreates RootFS for virtual machines used by LXC (Linux Containers)\n\n= REQUIREMENTS:\n* debootstrap\n* ...\n\n= ATTRIBUTES: \n\n= USAGE:\n\nCreate a databag called +virtual_machines+ and create machines with the following attributes:\n\n * :id\n * :domain (optional)\n * :variant (optional - minbase)\n * :suite (optional - lucid)\n\n\nDetails following..\n\n",
+    "recommendations": {
+    },
+    "platforms": {
+    },
+    "maintainer": "Company",
+    "version": "0.1.0",
+    "suggestions": {
+    },
+    "license": "Apache 2.0",
+    "name": "lxc",
+    "maintainer_email": "ssl@example.com",
+    "recipes": {
+    },
+    "conflicting": {
+    }
+  }
