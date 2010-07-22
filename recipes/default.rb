@@ -19,10 +19,9 @@
 
 package 'debootstrap'
 
-package 'lxc'
+include_recipe 'lxc::manage'
 
 host = node[:container]
-
 
 directory host[:base_directory] do
   action :create
