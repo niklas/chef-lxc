@@ -19,6 +19,8 @@
 
 package 'debootstrap'
 
+package 'lxc'
+
 host = node[:container]
 
 
