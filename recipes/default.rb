@@ -93,6 +93,12 @@ search(:virtual_machines) do |guest|
     command %Q~chroot #{rootfs} /usr/sbin/dpkg-reconfigure locales~
   end
 
+  bash 'remove as many init scripts as possible' do
+    code <<-EOSH
+      rm #{rootfs}/etc/init/{hwclock,mount,plymouth,udev}*
+    EOSH
+  end
+
   bash 'remove pointless services' do
     only_if %Q'test -f #{rootfs}/etc/rc0.d/S*umountfs'
     code <<-EOSH
