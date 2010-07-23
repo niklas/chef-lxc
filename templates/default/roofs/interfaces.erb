@@ -1,0 +1,8 @@
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address <%= @guest[:ipv4][:address] %>
+  netmask <%= @guest[:ipv4][:mask] %>
+  gateway <%= @guest[:ipv4][:gateway] %>
