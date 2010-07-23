@@ -67,4 +67,10 @@ search(:virtual_machines) do |guest|
     variables :host => host, :guest => guest
     action :create
   end
+
+  file rootfs / 'etc' / 'hostname' do
+    backup false
+    content hostname
+    action :create
+  end
 end
