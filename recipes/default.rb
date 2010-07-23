@@ -85,6 +85,28 @@ search(:virtual_machines) do |guest|
       chroot #{rootfs} /usr/sbin/update-rc.d -f umountfs remove
       chroot #{rootfs} /usr/sbin/update-rc.d -f hwclock.sh remove
       chroot #{rootfs} /usr/sbin/update-rc.d -f hwclockfirst.sh remove
+      chroot #{rootfs} /usr/sbin/update-rc.d -f umountroot remove
     EOSH
+  end
+
+  bash 'remove udev' do
+    only_if %Q~test -f #{rootfs}/etc/init.d/udev~
+    code <<-EOSH
+      apt-get remove --purge udev
+      rm -rf /etc/udev /lib/udev
+      apt-get autoremove
+    EOSH
+  end
+
+  file rootfs / 'etc' / 'init' / 'mountall*' do
+    action :delete
+  end
+  file rootfs / 'etc' / 'init' / 'upstart*' do
+    action :delete
+  end
+
+  template rootfs / 'etc' / 'init' / 'lxc.conf' do
+    source 'rootfs/lxc.conf.erb'
+    action :create
   end
 end

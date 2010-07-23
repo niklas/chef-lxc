@@ -1,0 +1,29 @@
+
+
+# description “Fix LXC container - Karmic”
+
+start on startup
+
+task
+pre-start script
+mount -t proc proc /proc
+mount -t devpts devpts /dev/pts
+mount -t sysfs sys /sys
+mount -t tmpfs varrun /var/run
+mount -t tmpfs varlock /var/lock
+mkdir -p /var/run/network
+touch /var/run/utmp
+chmod 664 /var/run/utmp
+chown root.utmp /var/run/utmp
+if [ "$(find /etc/network/ -name upstart -type f)" ]; then
+chmod -x /etc/network/*/upstart || true
+fi
+end script
+
+script
+start networking
+initctl emit filesystem --no-wait
+initctl emit local-filesystems --no-wait
+initctl emit virtual-filesystems --no-wait
+init 2
+end script
