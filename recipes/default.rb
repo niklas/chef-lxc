@@ -56,6 +56,12 @@ search(:virtual_machines) do |guest|
     action :create
   end
 
+  template rootfs / 'etc' / 'inittab' do
+    source "rootfs/inittab.erb"
+    variables :host => host, :guest => guest
+    action :create
+  end
+
   template rootfs / 'etc' / 'network' / 'interfaces' do
     source "rootfs/interfaces.erb"
     variables :host => host, :guest => guest
