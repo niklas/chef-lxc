@@ -73,4 +73,18 @@ search(:virtual_machines) do |guest|
     content hostname
     action :create
   end
+
+  execute 'reconfigure some services' do
+    not_if %Q'test -d #{rootfs}/usr/lib/locale/en_US*'
+    command %Q~chroot #{rootfs} /usr/sbin/dpkg-reconfigure locales~
+  end
+
+  bash 'remove pointless services in a container' do
+    only_if %Q'test -f #{rootfs}/etc/rc0.d/S*umountfs'
+    code <<-EOSH
+      chroot #{rootfs} /usr/sbin/update-rc.d -f umountfs remove
+      chroot #{rootfs} /usr/sbin/update-rc.d -f hwclock.sh remove
+      chroot #{rootfs} /usr/sbin/update-rc.d -f hwclockfirst.sh remove
+    EOSH
+  end
 end
