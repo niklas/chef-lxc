@@ -18,6 +18,7 @@
 
 
 package 'debootstrap'
+package 'apt-cacher-ng'
 
 include_recipe 'lxc::manage'
 
