@@ -32,6 +32,9 @@ directory host[:base_directory] do
 end
 
 
+# Followed instruction from
+# http://blog.bodhizazen.net/linux/lxc-configure-ubuntu-lucid-containers/
+
 search(:virtual_machines) do |guest|
   # Bootstrap
   domain = guest[:domain] || host[:default][:domain]
@@ -56,6 +59,12 @@ search(:virtual_machines) do |guest|
     action :create
   end
 
+  template host[:base_directory] / hostname + '.fstab' do
+    source 'fstab.erb'
+    variables :host => host, :guest => guest, :rootfs => rootfs, :hostname => hostname
+    action :create
+  end
+
   template rootfs / 'etc' / 'inittab' do
     source "rootfs/inittab.erb"
     variables :host => host, :guest => guest
@@ -74,12 +83,17 @@ search(:virtual_machines) do |guest|
     action :create
   end
 
+  template rootfs / 'etc' / 'apt' / 'sources.list' do
+    source 'rootfs/sources.list.erb'
+    variables :host => host, :guest => guest
+  end
+
   execute 'reconfigure some services' do
     not_if %Q'test -d #{rootfs}/usr/lib/locale/en_US*'
     command %Q~chroot #{rootfs} /usr/sbin/dpkg-reconfigure locales~
   end
 
-  bash 'remove pointless services in a container' do
+  bash 'remove pointless services' do
     only_if %Q'test -f #{rootfs}/etc/rc0.d/S*umountfs'
     code <<-EOSH
       chroot #{rootfs} /usr/sbin/update-rc.d -f umountfs remove
@@ -96,17 +110,5 @@ search(:virtual_machines) do |guest|
       rm -rf /etc/udev /lib/udev
       apt-get autoremove
     EOSH
-  end
-
-  file rootfs / 'etc' / 'init' / 'mountall*' do
-    action :delete
-  end
-  file rootfs / 'etc' / 'init' / 'upstart*' do
-    action :delete
-  end
-
-  template rootfs / 'etc' / 'init' / 'lxc.conf' do
-    source 'rootfs/lxc.conf.erb'
-    action :create
   end
 end

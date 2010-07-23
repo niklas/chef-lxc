@@ -7,6 +7,7 @@ lxc.tty = 4
 #lxc.network.mtu = 1500
 #lxc.network.ipv4 = <%= @guest[:ipv4][:address] %>
 lxc.rootfs = <%= @rootfs %>
+lxc.mount = <%= @host[:base_directory] / @hostname + '.fstab' %>
 lxc.cgroup.devices.deny = a
 # /dev/null and zero
 lxc.cgroup.devices.allow = c 1:3 rwm
