@@ -40,11 +40,12 @@ search(:virtual_machines) do |guest|
   variant = guest[:variant] ||= host[:default][:variant]
   suite   = guest[:suite  ] ||= host[:default][:suite  ]
   mirror  = guest[:mirror ] ||= host[:default][:mirror ]
+  packages= guest[:packages] ||= host[:default][:packages]
   guest[:ipv4] ||= host[:default][:ipv4]
   rootfs  = host[:base_directory] / hostname + '.rootfs'
 
   execute "debootstrap" do
-    command "debootstrap --variant=#{variant} #{suite} #{rootfs} #{mirror}"
+    command "debootstrap --variant=#{variant} --include #{packages.join(',')} #{suite} #{rootfs} #{mirror}"
     action :run
     not_if "test -f #{rootfs / 'etc' / 'issue'}"
   end

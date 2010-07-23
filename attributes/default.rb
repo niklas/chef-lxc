@@ -6,6 +6,7 @@ set_unless[:container] = {
     :variant => 'minbase',
     :suite => 'lucid',
     :mirror => 'http://localhost:3142/de.archive.ubuntu.com/ubuntu/',
+    :packages => %w(ifupdown locales netbase net-tools iproute openssh-server),
     :ipv4 => {
       :address => '192.168.168.100',
       :mask    => '255.255.255.0',
