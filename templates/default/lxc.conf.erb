@@ -1,11 +1,11 @@
 lxc.utsname = <%= @hostname %>
 lxc.tty = 4
-lxc.network.type = veth
-lxc.network.flags = up
-lxc.network.link = br0
-lxc.network.name = eth0
-lxc.network.mtu = 1500
-lxc.network.ipv4 = <%= @guest[:ipv4][:address] %>
+#lxc.network.type = veth
+#lxc.network.flags = up
+#lxc.network.link = br0
+#lxc.network.name = eth0
+#lxc.network.mtu = 1500
+#lxc.network.ipv4 = <%= @guest[:ipv4][:address] %>
 lxc.rootfs = <%= @rootfs %>
 lxc.cgroup.devices.deny = a
 # /dev/null and zero
