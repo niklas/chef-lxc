@@ -117,4 +117,9 @@ search(:virtual_machines) do |guest|
       apt-get autoremove
     EOSH
   end
+
+  template rootfs / 'etc' / 'init' / 'vm.conf' do
+    source 'rootfs/init-vm.conf.erb'
+    action :create
+  end
 end

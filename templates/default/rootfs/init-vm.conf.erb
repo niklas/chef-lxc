@@ -1,0 +1,8 @@
+start on startup
+
+emits filesystem
+
+
+# just spawn a tty to connect to with lxc-console
+respawn
+exec /sbin/getty -8 38400 tty1
