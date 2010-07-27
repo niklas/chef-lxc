@@ -96,6 +96,7 @@ search(:virtual_machines) do |guest|
       chroot #{rootfs} /usr/sbin/update-rc.d -f hwclock.sh remove
       chroot #{rootfs} /usr/sbin/update-rc.d -f hwclockfirst.sh remove
       chroot #{rootfs} /usr/sbin/update-rc.d -f umountroot remove
+      chroot #{rootfs} /usr/sbin/update-rc.d -f ondemand remove
     EOSH
   end
 
