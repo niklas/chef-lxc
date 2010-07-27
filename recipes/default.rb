@@ -95,11 +95,11 @@ search(:virtual_machines) do |guest|
   end
 
   bash 'remove as many init scripts as possible' do
+    only_if %Q~test -f /etc/init/hwclock.conf~
     code <<-EOSH
       rm #{rootfs}/etc/init/{hwclock,mount,plymouth,udev}*
       true
     EOSH
-    not_if %Q~test -f /etc/init/hwclock.conf~
   end
 
   bash 'remove pointless services' do
