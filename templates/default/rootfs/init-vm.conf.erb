@@ -1,8 +1,12 @@
 start on startup
 
+# we just fake the filesystem and network coming up,lxc did this for us
+
 emits filesystem
+emits net-device-up
 
-
-# just spawn a tty to connect to with lxc-console
-respawn
-exec /sbin/getty -8 38400 tty1
+script 
+        /sbin/initctl emit --no-wait filesystem
+        /sbin/initctl emit --no-wait net-device-up IFACE=lo
+        /sbin/initctl emit --no-wait net-device-up IFACE=eth0
+end script
