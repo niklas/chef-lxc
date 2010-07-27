@@ -112,9 +112,9 @@ search(:virtual_machines) do |guest|
   bash 'remove udev' do
     only_if %Q~test -f #{rootfs}/etc/init.d/udev~
     code <<-EOSH
-      apt-get remove --purge udev
-      rm -rf /etc/udev /lib/udev
-      apt-get autoremove
+      chroot #{rootfs} apt-get remove --purge udev
+      chroot #{rootfs} rm -rf /etc/udev /lib/udev
+      chroot #{rootfs} apt-get autoremove
     EOSH
   end
 
