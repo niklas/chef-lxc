@@ -1,0 +1,11 @@
+start on startup
+
+# we just fake the network coming up, lxc did this for us
+
+emits net-device-up
+
+script 
+        route add default gw <%= @host[:bridge][:ipv4][:address] %>
+        /sbin/initctl emit --no-wait net-device-up IFACE=lo
+        /sbin/initctl emit --no-wait net-device-up IFACE=eth0
+end script

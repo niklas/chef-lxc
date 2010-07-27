@@ -1,12 +1,9 @@
 start on startup
 
-# we just fake the filesystem and network coming up,lxc did this for us
+# we just fake the filesystem, lxc did this for us
 
 emits filesystem
-emits net-device-up
 
 script 
         /sbin/initctl emit --no-wait filesystem
-        /sbin/initctl emit --no-wait net-device-up IFACE=lo
-        /sbin/initctl emit --no-wait net-device-up IFACE=eth0
 end script

@@ -84,7 +84,7 @@ search(:virtual_machines) do |guest|
   bash 'remove as many init scripts as possible' do
     only_if %Q~test -f #{rootfs}/etc/init/hwclock.conf~
     code <<-EOSH
-      rm #{rootfs}/etc/init/{hwclock,mount,plymouth,udev}*
+      rm #{rootfs}/etc/init/{hwclock,mount,plymouth,udev,network}*
       true
     EOSH
   end
@@ -103,5 +103,10 @@ search(:virtual_machines) do |guest|
   template rootfs / 'etc' / 'init' / 'vm.conf' do
     source 'rootfs/init-vm.conf.erb'
     action :create
+  end
+
+  template rootfs / 'etc' / 'init' / 'vm-net.conf' do
+    source 'rootfs/init-net.conf.erb'
+    variables :host => node
   end
 end
