@@ -86,14 +86,6 @@ search(:virtual_machines) do |guest|
     variables :host => host, :guest => guest
   end
 
-  bash 'reconfigure english' do
-    not_if %Q'test -d #{rootfs}/usr/lib/locale/en_US*'
-    code <<-EOSH
-      chroot #{rootfs} apt-get install language-support-en
-      chroot #{rootfs} dpkg-reconfigure locales
-    EOSH
-  end
-
   bash 'remove as many init scripts as possible' do
     only_if %Q~test -f /etc/init/hwclock.conf~
     code <<-EOSH
