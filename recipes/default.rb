@@ -90,7 +90,7 @@ search(:virtual_machines) do |guest|
     not_if %Q'test -d #{rootfs}/usr/lib/locale/en_US*'
     code <<-EOSH
       chroot #{rootfs} apt-get install language-support-en
-      chroot #{rootfs} /usr/sbin/dpkg-reconfigure locales
+      chroot #{rootfs} dpkg-reconfigure locales
     EOSH
   end
 
