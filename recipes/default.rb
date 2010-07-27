@@ -104,15 +104,6 @@ search(:virtual_machines) do |guest|
     EOSH
   end
 
-  bash 'remove udev' do
-    only_if %Q~test -f #{rootfs}/etc/init.d/udev~
-    code <<-EOSH
-      chroot #{rootfs} apt-get remove --purge udev
-      chroot #{rootfs} rm -rf /etc/udev /lib/udev
-      chroot #{rootfs} apt-get autoremove
-    EOSH
-  end
-
   template rootfs / 'etc' / 'init' / 'vm.conf' do
     source 'rootfs/init-vm.conf.erb'
     action :create
