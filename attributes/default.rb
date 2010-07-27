@@ -1,5 +1,4 @@
 set_unless[:container] = {
-  :guest_ips => [],
   :base_directory => '/tmp/containers',
   :default => {
     :domain => "vm.local", 
@@ -8,9 +7,16 @@ set_unless[:container] = {
     :mirror => 'http://localhost:3142/de.archive.ubuntu.com/ubuntu/',
     :packages => %w(ifupdown locales netbase net-tools iproute openssh-server console-setup),
     :ipv4 => {
-      :address => '192.168.168.100',
-      :mask    => '255.255.255.0',
-      :gateway => '192.168.168.1'
+      :cidr => '192.168.168.100/24'
     }
+  }
+}
+
+# ipv4.address will be used as gateway for guest
+set_unless[:bridge] = {
+  :ipv4 => {
+    :address  => '192.168.168.1',
+    :netmask  => '255.255.255.0',
+    :broadcast => '192.168.168.255'
   }
 }

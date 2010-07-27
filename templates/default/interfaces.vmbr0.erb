@@ -1,0 +1,16 @@
+
+
+# BEGIN_vmbr0  -- do not remove
+# from interfaces.vmbr0 to interfaces
+auto vmbr0
+iface vmbr0 inet static
+  address   <%= @node[:bridge][:ipv4][:address] %>
+  broadcast <%= @node[:bridge][:ipv4][:broadcast] %>
+  netmask   <%= @node[:bridge][:ipv4][:netmask] %>
+  bridge_ports none
+  bridge_stp off
+  bridge_fd 0
+  pre-up brctl addbr vmbr0
+  post-down ifconfig vmbr0 down
+  post-down brctl delbr vmbr0
+# END_vmbr0  -- do not remove

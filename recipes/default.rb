@@ -21,6 +21,7 @@ package 'debootstrap'
 package 'apt-cacher-ng'
 
 include_recipe 'lxc::manage'
+include_recipe 'lxc::network_bridge'
 
 host = node[:container]
 
@@ -67,12 +68,6 @@ search(:virtual_machines) do |guest|
 
   file rootfs / 'etc' / 'inittab' do
     action :delete
-  end
-
-  template rootfs / 'etc' / 'network' / 'interfaces' do
-    source "rootfs/interfaces.erb"
-    variables :host => host, :guest => guest
-    action :create
   end
 
   file rootfs / 'etc' / 'hostname' do
