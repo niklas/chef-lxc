@@ -30,6 +30,15 @@ bash 'activate network bridge' do
   code <<-EOSH
     sed -i.vmbr0_old '/# BEGIN_vmbr0/,/# END_vmbr0/d' /etc/network/interfaces
     cat /etc/network/interfaces.vmbr0 >> /etc/network/interfaces
+    /etc/init.d/networking restart
+  EOSH
+end
+
+bash 'revert to old network configuration (ping google.de gave no answer in 10s)' do
+  not_if %Q~ping -q -w 10 -c 1 google.de~
+  code <<-EOSH
+    cp /etc/network/interfaces.vmbr0_old /etc/network/interfaces
+    /etc/init.d/networking restart
   EOSH
 end
 
