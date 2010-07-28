@@ -1,9 +1,13 @@
 = DESCRIPTION:
-Creates RootFS for virtual machines used by LXC (Linux Containers)
+Creates RootFS for virtual machines used by LXC (Linux Containers) and provisions them until they are registered at the same chef server.
 
 = REQUIREMENTS:
 * debootstrap
 * ...
+
+= WARNING:
+
+You must make Client of the Host an Admin in the Chef WebUI, else it cannot register the VMs as new clients.
 
 = ATTRIBUTES: 
 
@@ -12,10 +16,8 @@ Creates RootFS for virtual machines used by LXC (Linux Containers)
 Create a databag called +virtual_machines+ and create machines with the following attributes:
 
  * :id
- * :domain (optional)
- * :variant (optional - minbase)
- * :suite (optional - lucid)
+ * :ip4v
+    * :cidr (i.e. 192.168.168.100/24)
 
 
-Details following..
 
