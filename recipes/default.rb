@@ -121,6 +121,10 @@ search(:virtual_machines) do |guest|
     variables :host => host, :guest => guest
   end
 
+  directory rootfs / 'etc' / 'chef' do
+    action :create
+  end
+
   execute "register vm at chef server" do
     private_key = rootfs / 'etc' / 'chef' / 'client.pem'
     command %Q~knife client -u #{node[:fqdn]} -k /etc/chef/client.pem --no-editor create #{hostname} -f #{private_key}~
