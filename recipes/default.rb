@@ -109,4 +109,9 @@ search(:virtual_machines) do |guest|
     source 'rootfs/init-net.conf.erb'
     variables :host => node
   end
+
+  template rootfs / 'etc' / 'init' / 'chef-install.conf' do
+    source 'rootfs/chef-install.conf.erb'
+    variables :host => host, :guest => guest
+  end
 end
