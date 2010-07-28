@@ -12,6 +12,7 @@ file '/etc/sysctl.d/33-ip-forward.conf' do
   content "net.ipv4.ip_forward=1\n"
 end
 
+#TODO just notify
 execute 'activate IP forwarding' do
   command 'service procps start'
 end
@@ -21,8 +22,6 @@ template '/etc/network/interfaces.vmbr0' do
   variables :node => node
   action :create
 end
-
-# TODO append to interfaces if neccessary
 
 bash 'activate network bridge' do
   # interfaces older than .vmbr0 ?
