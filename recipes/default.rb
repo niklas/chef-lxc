@@ -76,6 +76,12 @@ search(:virtual_machines) do |guest|
     action :create
   end
 
+  file rootfs / 'etc' / 'hosts' do
+    backup false
+    action :create
+    content %Q~127.0.0.1 #{hostname} #{guest[:id]} localhost\n~
+  end
+
   template rootfs / 'etc' / 'apt' / 'sources.list' do
     source 'rootfs/sources.list.erb'
     variables :host => host, :guest => guest
