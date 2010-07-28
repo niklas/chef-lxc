@@ -27,7 +27,7 @@ host = node[:container]
 
 directory host[:base_directory] do
   action :create
-  mode 0755
+  mode '0755'
   owner 'root'
   group 'root'
 end
@@ -123,6 +123,9 @@ search(:virtual_machines) do |guest|
 
   directory rootfs / 'etc' / 'chef' do
     action :create
+    owner 'chef'
+    group 'chef'
+    mode '0755'
   end
 
   execute "register vm at chef server" do
