@@ -116,6 +116,12 @@ search(:virtual_machines) do |guest|
     variables :host => node
   end
 
+  template rootfs / 'usr' / 'sbin' / 'install-chef.sh' do
+    source 'rootfs/install-chef.erb'
+    variables :host => host, :guest => guest
+    mode '0755'
+  end
+
   template rootfs / 'etc' / 'init' / 'chef-install.conf' do
     source 'rootfs/chef-install.conf.erb'
     variables :host => host, :guest => guest

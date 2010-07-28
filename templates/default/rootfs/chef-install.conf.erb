@@ -1,11 +1,2 @@
 start on filesystem
-
-script
-  if [ ! -f "/usr/bin/chef-client" ]; then
-    echo "deb http://apt.opscode.com/ lucid main" | tee /etc/apt/sources.list.d/opscode.list
-    wget --quiet -O - http://apt.opscode.com/packages@opscode.com.gpg.key | apt-key add -
-    apt-get update
-    echo -e "chef\tchef/chef_server_url\tstring\t<%= Chef::Config[:chef_server_url] %>" | debconf-set-selections
-    apt-get -y install chef
-  fi
-end script
+exec /usr/sbin/install-chef.sh
