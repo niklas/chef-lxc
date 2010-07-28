@@ -4,8 +4,8 @@ set_unless[:container] = {
     :domain => "vm.local", 
     :variant => 'minbase',
     :suite => 'lucid',
-    :mirror => 'http://localhost:3142/de.archive.ubuntu.com/ubuntu/',
-    :packages => %w(ifupdown locales netbase net-tools iproute openssh-server console-setup),
+    :mirror => "http://#{node[:fqdn]}:3142/de.archive.ubuntu.com/ubuntu/",
+    :packages => %w(ifupdown locales netbase net-tools iproute openssh-server console-setup iputils-ping wget gnupg),
     :ipv4 => {
       :cidr => '192.168.168.100/24'
     }
