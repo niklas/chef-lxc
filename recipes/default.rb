@@ -134,11 +134,26 @@ search(:virtual_machines) do |guest|
     mode '0755'
   end
 
+  chef_private_key = rootfs / 'etc' / 'chef' / 'client.pem'
+  chef_archived_key = host[:base_directory] / "#{hostname}.chef.pem"
   execute "register vm at chef server" do
-    private_key = rootfs / 'etc' / 'chef' / 'client.pem'
-    command %Q~knife client -u #{node[:fqdn]} -k /etc/chef/client.pem --no-editor create #{hostname} -f #{private_key}~
+    command %Q~knife client -u #{node[:fqdn]} -k /etc/chef/client.pem --no-editor create #{hostname} -f #{chef_archived_key}~
     action :run
-    not_if "test -f #{private_key}"
+    not_if "test -f #{chef_archived_key}"
+  end
+
+  execute "archive chef private key" do
+    command %Q~cp #{chef_private_key} #{chef_archived_key}~
+    action :run
+    not_if "test -f #{chef_archived_key}"
+    only_if "test -f #{chef_private_key}"
+  end
+
+  execute "restore chef private key" do
+    command %Q~cp #{chef_archived_key} #{chef_private_key}~
+    action :run
+    only_if "test -f #{chef_archived_key}"
+    not_if "test -f #{chef_private_key}"
   end
 
   # this only has to be done in ubuntu
