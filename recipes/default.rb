@@ -140,4 +140,26 @@ search(:virtual_machines) do |guest|
     action :run
     not_if "test -f #{private_key}"
   end
+
+  # this only has to be done in ubuntu
+  # If you want to read this, you will need popcorn!
+  # https://bugs.launchpad.net/ubuntu/+source/gems/+bug/145267
+  execute "add rubygems executable directory to environment" do
+    bad_bin = "/var/lib/gems/1.8/bin"
+    not_if "grep ':#{bad_bin}' #{rootfs}/etc/environment"
+    command %Q~sed -i.rubygems 's#"$#:#{bad_bin}"#' #{rootfs}/etc/environment~
+  end
+
+
+  ssh_dir = %Q~#{host[:base_directory]}/#{hostname}.ssh~
+  execute "restore ssh host keys" do
+    only_if "test -d #{ssh_dir}"
+    command %Q~cp #{ssh_dir}/* #{rootfs}/etc/ssh/~
+  end
+
+  bash "archive ssh host keys" do
+    not_if "test -d #{ssh_dir}"
+    code %Q~mkdir -p #{ssh_dir} && cp #{rootfs}/etc/ssh/ssh_host_{r,d}sa_key{,.pub} #{ssh_dir}/~
+  end
+
 end
