@@ -6,3 +6,6 @@ apt-get update
 echo -e "chef\tchef/chef_server_url\tstring\t<%= Chef::Config[:chef_server_url] %>" | debconf-set-selections
 apt-get -y install chef
 
+# ubuntu's rubygems install in a path that is normally not in the PATH
+echo 'PATH=$PATH:/var/lib/gems/1.8/bin' >> /etc/default/chef-client
+
