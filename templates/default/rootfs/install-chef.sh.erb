@@ -1,7 +1,11 @@
 #!/bin/bash
 
-echo "deb http://apt.opscode.com/ lucid main" | tee /etc/apt/sources.list.d/opscode.list
+echo "deb http://apt.opscode.com/ lucid main" > /etc/apt/sources.list.d/opscode.list
 wget --quiet -O - http://apt.opscode.com/packages@opscode.com.gpg.key | apt-key add -
+
+echo "deb http://ppa.launchpad.net/ubuntu-on-rails/ppa/ubuntu lucid main" > /etc/apt/sources.list.d/ubuntu-on-rails.list
+wget --quiet -O - 'http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0xB6C6326781C0BE11' | apt-key add -
+
 apt-get update
 echo -e "chef\tchef/chef_server_url\tstring\t<%= Chef::Config[:chef_server_url] %>" | debconf-set-selections
 apt-get -y install chef
