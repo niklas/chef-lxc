@@ -1,9 +1,25 @@
-start on startup
-
-# we just fake the filesystem, lxc did this for us
+# VM – Fix init sequence to have LXC working with upstart
+# description “Fix LXC container - Karmic”
 
 emits filesystem
+emits local-filesystems
+emits virtual-filesystems
 
-script 
-        /sbin/initctl emit --no-wait filesystem
+start on startup
+task
+pre-start script
+  mkdir -p /var/run/network
+  touch /var/run/utmp
+  chmod 664 /var/run/utmp
+  chown root.utmp /var/run/utmp
+  if [ "$(find /etc/network/ -name upstart -type f)" ]; then
+     chmod -x /etc/network/*/upstart || true
+  fi
+end script
+
+script
+  initctl emit filesystem --no-wait
+  initctl emit local-filesystems --no-wait
+  initctl emit virtual-filesystems --no-wait
+  init 2
 end script
