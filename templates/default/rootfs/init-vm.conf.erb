@@ -18,8 +18,11 @@ pre-start script
 end script
 
 script
+
   initctl emit filesystem --no-wait
   initctl emit local-filesystems --no-wait
   initctl emit virtual-filesystems --no-wait
   init 2
+  ethtool -K eth0 tx off
+
 end script
