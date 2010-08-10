@@ -1,0 +1,24 @@
+#! /bin/sh
+# lxc-status-all
+# Status summary of all containers, mostly just for /etc/init.d/lxc
+# exit values expected by rc scripts:
+# 0 - service up and running
+# 3 - service not running (unused)
+# 4 - service status unknown
+#
+# If any containers are running, consider the "service" to be up & running.
+# This way the rc script will not let the host shut down until all containers
+# are down first.
+#
+# 20100212 brian@aljex.com
+
+typeset -i VM_NR=0
+VM_LIST=`lxc-ls -1`
+
+[[ "$VM_LIST" ]] && for VM in $VM_LIST ;do
+	VM_ST=`lxc-info -n $VM`
+	echo "$VM_ST"
+	[[ "${VM_ST##* }" = "RUNNING" ]] && ((VM_NR++))
+done
+
+[[ $VM_NR -gt 0 ]] && exit 0 || exit 3

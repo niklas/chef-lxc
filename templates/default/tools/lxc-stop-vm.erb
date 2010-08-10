@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Note: assuming uid==0 is root -- might break with userns??
+if [ "$(id -u)" != "0" ]; then
+        echo "This script should be run as 'root'"
+        exit 1
+fi
+
+function usage() {
+cat << EOF
+Usage:
+	$0 -n <container-name>		stop the container with shutdown agent
+EOF
+exit 1
+}
+
+container=""
+
+while getopts ":n:" opt; do
+  case $opt in
+    n)
+      container=$OPTARG
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      usage
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      usage
+      ;;
+  esac
+done
+
+[[ ${container} == "" ]] && usage
+retcode=0
+
+typeset -i PID=0
+lxc-ps -C init -opid | while read mycontainer PID ;do
+	[[ $PID -gt 1 ]] || continue
+	[[ "$mycontainer" != "$container" ]] && continue
+	/usr/bin/logger -t LXC-STOP "[${container}] Sending PWR signal to PID: ${PID}."
+	kill -PWR $PID
+	/usr/bin/logger -t LXC-STOP "[${container}] Waiting for container to stop."
+	lxc-wait --name=${container} --state=STOPPED
+	exit 1
+done
+
+found=$?
+[[ ${found} -ne 1 ]] && echo "Container ${container} not found !" && retcode=1
+
+exit ${retcode}

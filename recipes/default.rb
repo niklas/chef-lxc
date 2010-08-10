@@ -19,11 +19,14 @@
 
 package 'debootstrap'
 package 'apt-cacher-ng'
+package 'inotify-tools'
 
 include_recipe 'lxc::manage'
 include_recipe 'lxc::network_bridge'
 
 host = node[:container]
+
+machines = search(:virtual_machines)
 
 directory host[:base_directory] do
   action :create
@@ -32,11 +35,68 @@ directory host[:base_directory] do
   group 'root'
 end
 
+template host[:base_directory] / 'main.conf' do
+  source 'tools/main.conf.erb'
+  mode '0644'
+  owner 'root'
+  group 'root'
+  variables :machines => machines
+end
+
+template '/usr/bin/lxc-shutdown-agent' do
+  source 'tools/lxc-shutdown-agent.erb'
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
+
+template '/usr/bin/lxc-start-vm' do
+  source 'tools/lxc-start-vm.erb'
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
+template '/usr/bin/lxc-stop-vm' do
+  source 'tools/lxc-stop-vm.erb'
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
+template '/usr/bin/lxc-start-all' do
+  source 'tools/lxc-start-all.erb'
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
+template '/usr/bin/lxc-shutdown-all' do
+  source 'tools/lxc-shutdown-all.erb'
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
+template '/usr/bin/lxc-status-all' do
+  source 'tools/lxc-status-all.erb'
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
+template '/etc/init/lxc.conf' do
+  source 'init-lxc.conf.erb'
+  mode '0644'
+  owner 'root'
+  group 'root'
+end
 
 # Followed instruction from
 # http://blog.bodhizazen.net/linux/lxc-configure-ubuntu-lucid-containers/
 
-search(:virtual_machines) do |guest|
+machines.each do |guest|
   # Bootstrap
   domain = guest[:domain] || host[:default][:domain]
   hostname = "#{guest[:id]}.#{domain}"
@@ -47,7 +107,7 @@ search(:virtual_machines) do |guest|
   packages= guest[:packages] ||= host[:default][:packages]
   guest[:ipv4] ||= host[:default][:ipv4]
 
-  home = host[:base_directory] / hostname
+  home = host[:base_directory] / guest[:id]
   rootfs  =  home / 'rootfs'
 
   execute "debootstrap" do
@@ -56,7 +116,7 @@ search(:virtual_machines) do |guest|
     not_if "test -f #{rootfs / 'etc' / 'issue'}"
   end
 
-  template home / 'lxc.conf' do
+  template home / 'config' do
     source "lxc.conf.erb"
     variables :host => host, :guest => guest, :home => home, :rootfs => rootfs, :hostname => hostname
     action :create

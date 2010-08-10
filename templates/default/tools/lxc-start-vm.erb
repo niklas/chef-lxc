@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Note: assuming uid==0 is root -- might break with userns??
+if [ "$(id -u)" != "0" ]; then
+        echo "This script should be run as 'root'"
+        exit 1
+fi
+
+function usage() {
+cat << EOF
+Usage:
+	$0 -n <container-name>		launches the container with shutdown agent
+EOF
+#	$0 -n <container-name> -a	launches the container only, do not launch agent [for scripts]
+exit 1
+}
+
+LXC_BASE=<%= node[:container][:base_directory] %>
+CGROUP_MOUNT=/cgroup
+LXC_CONF=${LXC_BASE}/main.conf
+[ ! -f $LXC_CONF ] && echo "config with list of machines not found: $LXC_CONF" && exit 1
+[[ -s $LXC_CONF ]] && source $LXC_CONF
+
+container=""
+LAUNCH_AGENT=1
+
+while getopts ":an:" opt; do
+  case $opt in
+    n)
+      container=$OPTARG
+      ;;
+    a)
+      LAUNCH_AGENT=0
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      usage
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      usage
+      ;;
+  esac
+done
+
+[[ ${container} == "" ]] && usage
+LOG=${LXC_BASE}/${container}/init.log
+CONF=${LXC_BASE}/${container}/config
+
+/usr/bin/logger -t LXC-START "[${container}] Launching container."
+/usr/bin/screen -dmS init-${container} /usr/bin/lxc-start --logfile=$LOG -n ${container} -f $CONF
+lxc-wait --name=${container} --state=RUNNING
+RETVAL=$?
+if [ $RETVAL = 0 ]; then
+	if [ $LAUNCH_AGENT == 1 ]; then
+		/usr/bin/logger -t LXC-START "[${container}] Launching shutdown agent."
+		nohup /usr/bin/lxc-shutdown-agent ${container} >/dev/null 2>&1 &
+	fi
+fi
+exit $RETVAL

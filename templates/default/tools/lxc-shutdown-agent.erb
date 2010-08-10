@@ -1,0 +1,77 @@
+#!/bin/bash -
+# lxc-shutdown-agent
+# Monitor a container's runlevel and tasklist and perform lxc-stop/start
+# on the containers behalf to emulate hardware shutdown or reboot.
+# Perform lxc-stop if container goes to runlevel 0
+# Perform lxc-stop;lxc-start if container goes to runlevel 6
+# When doing lxc-stop, wait for task list to reach less than 2 first.
+#
+# Based on:
+# http://www.mail-archive.com/lxc-users@lists.sourceforge.net/msg00074.html
+#
+# run from /etc/init.d/lxc
+# When the rc start script starts a container, it also runs this in the
+# background to monitor that container.
+#
+# Requires intotifywait, which is neither installed by default nor even
+# available in the standard oss non-oss repos. You have to get the package
+# "inotify-tools" from the "Education" or "home:aljex" repos.
+#
+# 20100212 - Brian K. White - brian@aljex.com
+# 20100810 - Niklas Hofer <niklas+dev@lanpartei.de>
+
+LXC_BASE=<%= node[:container][:base_directory] %>
+CGROUP_MOUNT=/cgroup
+LXC_CONF=${LXC_BASE}/main.conf
+[[ -s $LXC_CONF ]] && . $LXC_CONF
+
+self=$0
+VM=$1
+VM_CFG=${LXC_BASE}/${VM}/config
+
+abrt () { echo "${self}: $@" ; exit 1 ; }
+
+stop_vm () {
+	/usr/bin/logger -t LXC-AGENT "[${VM}] waiting for processes to end..."
+	# we don' need no steenkeeng `wc -l ...`
+	t=${CGROUP_MOUNT}/${VM}/tasks
+	n=2
+	while [[ $n -gt 1 ]] ; do
+		n=0
+		[[ -s $t ]] || break
+		while read ;do ((n++)) ;done <$t ;inotifywait $t
+	done
+	/usr/bin/logger -t LXC-AGENT "[${VM}] Stopping container."
+	lxc-stop -n $VM
+	/usr/bin/logger -t LXC-AGENT "[${VM}] waiting for container to be stopped."
+	lxc-wait -n $VM -s STOPPED
+	/usr/bin/logger -t LXC-AGENT "[${VM}] container is stopped."
+}
+
+start_vm () {
+	/usr/bin/logger -t LXC-AGENT "[${VM}] Starting container."
+	nohup /usr/bin/lxc-start-vm -n $VM -a >/dev/null 2>&1 &
+}
+
+VM_STATE=`lxc-info -n $VM` VM_STATE=${VM_STATE##* }
+[[ "$VM_STATE" = "RUNNING" ]] || abrt "Container \"$VM\" is not running."
+
+unset VM_ROOTFS
+while read a b c ;do [[ "$a" = "lxc.rootfs" ]] && VM_ROOTFS="$c" ;done <$VM_CFG
+VM_ROOTFS=${LXC_BASE}/${VM}/rootfs
+[[ "$VM_ROOTFS" ]] || abrt "Could not determine rootfs for container \"$VM\"."
+VM_UTMP=${VM_ROOTFS}/var/run/utmp
+
+sleep 1
+
+/usr/bin/logger -t LXC-AGENT "[${VM}] waiting for runlevel change"
+while inotifywait -qq $VM_UTMP ; do
+	RUNLEVEL=`/sbin/runlevel $VM_UTMP`
+	/usr/bin/logger -t LXC-AGENT "[${VM}] runlevel changed to ${RUNLEVEL}"
+	case "${RUNLEVEL}" in
+		N??) : ;;
+		??0) stop_vm ; break ;;
+		??6) stop_vm ; start_vm ; sleep 1;;
+	esac
+done
+/usr/bin/logger -t LXC-AGENT "[${VM}] exit."

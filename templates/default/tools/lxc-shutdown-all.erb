@@ -1,0 +1,25 @@
+#! /bin/sh
+# lxc-shutdown-all
+# Shut down all containers.
+# run from /etc/init.d/lxc
+#
+# All we do here is send a SIGPWR to each containers init process.
+#
+# We rely on each container having an inittab with a powerfail entry that
+# does "init 0".
+#
+# And we rely on each container having an instance of lxc-shutdown-agent
+# monitoring that containers runlevel & task list to do the actual lxc-stop.
+#
+# TODO: Detect if either condition above is not met to avoid waiting forever.
+# TODO: Screen output dependant on if parent is rc script or not.
+#
+# 20100212 - Brian K. White - brian@aljex.com
+
+typeset -i PID=0
+lxc-ps -C init -opid |while read VM PID ;do
+	[[ $PID -gt 1 ]] || continue
+	echo -n " $VM"
+	kill -PWR $PID
+	lxc-wait -n $VM -s STOPPED
+done

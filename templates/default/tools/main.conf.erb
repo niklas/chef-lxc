@@ -1,0 +1,3 @@
+# use the ! prefix to disable starting/stopping a container
+# example: CONTAINERS=(CONTAINER_NAME_1 CONTAINER_NAME_2 CONTAINER_NAME3 !CONTAINER_NAME4)
+CONTAINERS=(<% @machines.each do |m| %><%= m[:disabled] && '!' %><%= m[:id]%> <% end %>)

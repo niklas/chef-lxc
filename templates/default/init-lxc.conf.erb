@@ -1,0 +1,17 @@
+description     "manage all lxc virtual machines"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+task
+
+
+exec true
+
+pre-start script
+  /usr/bin/lxc-start-all
+end script
+
+post-stop script
+  /usr/bin/lxc-shutdown-all
+end script

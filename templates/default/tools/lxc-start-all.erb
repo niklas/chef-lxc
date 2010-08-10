@@ -1,0 +1,31 @@
+#!/bin/bash -
+# lxc-start-all
+# 
+# starts all configured containers which are not disables in main.conf
+
+LXC_BASE=<%= node[:container][:base_directory] %>
+CGROUP_MOUNT=/cgroup
+LXC_CONF=${LXC_BASE}/main.conf
+[ ! -f $LXC_CONF ] && echo "config with list of machines not found: $LXC_CONF" && exit 1
+[[ -s $LXC_CONF ]] && source $LXC_CONF
+
+
+echo -n "Starting LXC containers... "
+
+for container in "${CONTAINERS[@]}"; do
+  if [ "${container}" = "${container#!}" ]; then
+    echo -n ${container}
+    /usr/bin/lxc-start-vm -n ${container}
+    RETVAL=$?
+    if [ $RETVAL = 0 ]; then
+      echo -n '.'
+    else
+      echo -n '!'
+    fi
+  fi
+done
+
+echo
+
+
+
