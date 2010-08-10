@@ -46,7 +46,9 @@ search(:virtual_machines) do |guest|
   mirror  = guest[:mirror ] ||= host[:default][:mirror ]
   packages= guest[:packages] ||= host[:default][:packages]
   guest[:ipv4] ||= host[:default][:ipv4]
-  rootfs  = host[:base_directory] / hostname + '.rootfs'
+
+  home = host[:base_directory] / hostname
+  rootfs  =  home / 'rootfs'
 
   execute "debootstrap" do
     command "debootstrap --variant=#{variant} --include #{packages.join(',')} #{suite} #{rootfs} #{mirror}"
@@ -54,13 +56,13 @@ search(:virtual_machines) do |guest|
     not_if "test -f #{rootfs / 'etc' / 'issue'}"
   end
 
-  template host[:base_directory] / hostname + '.lxc.conf' do
+  template home / 'lxc.conf' do
     source "lxc.conf.erb"
-    variables :host => host, :guest => guest, :rootfs => rootfs, :hostname => hostname
+    variables :host => host, :guest => guest, :home => home, :rootfs => rootfs, :hostname => hostname
     action :create
   end
 
-  template host[:base_directory] / hostname + '.fstab' do
+  template home / 'fstab' do
     source 'fstab.erb'
     variables :host => host, :guest => guest, :rootfs => rootfs, :hostname => hostname
     action :create
@@ -140,7 +142,7 @@ search(:virtual_machines) do |guest|
   end
 
   chef_private_key = rootfs / 'etc' / 'chef' / 'client.pem'
-  chef_archived_key = host[:base_directory] / "#{hostname}.chef.pem"
+  chef_archived_key = home / "chef-client.pem"
   execute "register vm at chef server" do
     command %Q~knife client -u #{node[:fqdn]} -k /etc/chef/client.pem --no-editor create #{hostname} -f #{chef_archived_key}~
     action :run
@@ -171,7 +173,7 @@ search(:virtual_machines) do |guest|
   end
 
 
-  ssh_dir = %Q~#{host[:base_directory]}/#{hostname}.ssh~
+  ssh_dir = home / 'ssh'
   execute "restore ssh host keys" do
     only_if "test -d #{ssh_dir}"
     command %Q~cp #{ssh_dir}/* #{rootfs}/etc/ssh/~
