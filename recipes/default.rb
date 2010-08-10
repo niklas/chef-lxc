@@ -116,6 +116,11 @@ search(:virtual_machines) do |guest|
     variables :host => node
   end
 
+  template rootfs / 'etc' / 'init' / 'vm-power.conf' do
+    source 'rootfs/vm-power.conf.erb'
+    variables :host => node
+  end
+
   template rootfs / 'usr' / 'sbin' / 'install-chef.sh' do
     source 'rootfs/install-chef.sh.erb'
     variables :host => host, :guest => guest

@@ -1,0 +1,6 @@
+start on power-status-changed and runlevel [2345]                                                         
+                                                                                                          
+script                                                                                                    
+  /usr/bin/logger -t <%= @host[:fqdn] -%> "System shutdown requested"
+  /sbin/shutdown -h now "SIGPWR received"
+end script
