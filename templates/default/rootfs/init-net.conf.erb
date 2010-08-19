@@ -5,7 +5,9 @@ start on startup
 emits net-device-up
 
 script 
-        route add default gw <%= @host[:bridge][:ipv4][:address] %>
+        <%- if bridge = @host[:bridges][    (@guest[:ipv4][:bridge] || 'vmbr0')    ] %>
+        route add default gw <%= bridge[:ipv4][:address] %>
+        <%- end %>
         /sbin/initctl emit --no-wait net-device-up IFACE=lo
         /sbin/initctl emit --no-wait net-device-up IFACE=eth0
 end script

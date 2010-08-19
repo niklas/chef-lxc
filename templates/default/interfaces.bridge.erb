@@ -1,0 +1,17 @@
+
+
+# BEGIN_<%= @bridge %>  -- do not remove
+# from interfaces.<%= @bridge %> to interfaces
+auto <%= @bridge %>
+iface <%= @bridge %> inet static
+  address   <%= @settings[:ipv4][:address] %>
+  broadcast <%= @settings[:ipv4][:broadcast] %>
+  netmask   <%= @settings[:ipv4][:netmask] %>
+  bridge_ports none
+  bridge_stp off
+  bridge_fd 0
+  pre-up brctl addbr <%= @bridge %>
+  post-down ifconfig <%= @bridge %> down
+  post-down brctl delbr <%= @bridge %>
+# END_<%= @bridge %>  -- do not remove
+

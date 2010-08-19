@@ -13,10 +13,12 @@ set_unless[:container] = {
 }
 
 # ipv4.address will be used as gateway for guest
-set_unless[:bridge] = {
-  :ipv4 => {
-    :address  => '192.168.168.1',
-    :netmask  => '255.255.255.0',
-    :broadcast => '192.168.168.255'
+set_unless[:bridges] = {
+  :vmbr0 => {
+    :ipv4 => {
+      :address  => '192.168.168.1',
+      :netmask  => '255.255.255.0',
+      :broadcast => '192.168.168.255'
+    }
   }
 }

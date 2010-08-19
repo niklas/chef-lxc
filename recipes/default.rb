@@ -175,7 +175,7 @@ machines.each do |guest|
 
   template rootfs / 'etc' / 'init' / 'vm-net.conf' do
     source 'rootfs/init-net.conf.erb'
-    variables :host => node
+    variables :host => node, :guest => guest
   end
 
   template rootfs / 'etc' / 'init' / 'vm-power.conf' do

@@ -17,29 +17,37 @@ execute 'activate IP forwarding' do
   command 'service procps start'
 end
 
-template '/etc/network/interfaces.vmbr0' do
-  source 'interfaces.vmbr0.erb'
-  variables :node => node
-  action :create
-end
 
-bash 'activate network bridge' do
-  # interfaces older than .vmbr0 ?
-  only_if %Q~test /etc/network/interfaces -ot /etc/network/interfaces.vmbr0~
-  code <<-EOSH
-    sed -i.vmbr0_old '/# BEGIN_vmbr0/,/# END_vmbr0/d' /etc/network/interfaces
-    cat /etc/network/interfaces.vmbr0 >> /etc/network/interfaces
-    /etc/init.d/networking restart
-  EOSH
-end
+if node.attribute?('bridges')
+  node['bridges'].each do |bridge, settings|
 
-bash 'revert to old network configuration (ping google.de gave no answer in 10s)' do
-  not_if %Q~ping -q -w 10 -c 1 google.de~
-  code <<-EOSH
-    cp /etc/network/interfaces.vmbr0_old /etc/network/interfaces
-    /etc/init.d/networking restart
-  EOSH
-end
+    bridge_config = "/etc/network/interfaces.#{bridge}"
 
+    template bridge_config do
+      source 'interfaces.bridge.erb'
+      variables :bridge => bridge, :settings => settings
+      action :create
+    end
+
+    bash "activate network bridge #{bridge}" do
+      # is the interfaces newer
+      only_if %Q~test /etc/network/interfaces -ot #{bridge_config}~
+      code <<-EOSH
+        sed -i.#{bridge}_old '/# BEGIN_#{bridge}/,/# END_#{bridge}/d' /etc/network/interfaces
+        cat /etc/network/interfaces.#{bridge} >> /etc/network/interfaces
+        /etc/init.d/networking restart
+      EOSH
+    end
+
+    bash "revert to network configuration before #{bridge} (ping google.de gave no answer in 10s)" do
+      not_if %Q~ping -q -w 10 -c 1 google.de~
+      code <<-EOSH
+        cp /etc/network/interfaces.#{bridge}_old /etc/network/interfaces
+        /etc/init.d/networking restart
+      EOSH
+    end
+
+  end
+end
 
 
