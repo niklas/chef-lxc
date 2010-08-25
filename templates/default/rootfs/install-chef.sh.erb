@@ -8,6 +8,8 @@ wget --quiet -O - 'http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x
 
 apt-get update
 echo -e "chef\tchef/chef_server_url\tstring\t<%= Chef::Config[:chef_server_url] %>" | debconf-set-selections
+
+rm /etc/default/chef-client
 apt-get -y install chef
 
 # ubuntu's rubygems install in a path that is normally not in the PATH
