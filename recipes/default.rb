@@ -26,7 +26,7 @@ include_recipe 'lxc::network_bridge'
 
 host = node[:container]
 
-machines = search(:virtual_machines)
+machines = search(:virtual_machines, "host:#{node['fqdn']}")
 
 directory host[:base_directory] do
   action :create

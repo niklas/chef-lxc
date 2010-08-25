@@ -13,5 +13,11 @@ iface <%= @bridge %> inet static
   pre-up brctl addbr <%= @bridge %>
   post-down ifconfig <%= @bridge %> down
   post-down brctl delbr <%= @bridge %>
+
+<%- if @settings.has_key?(:ipv6) %>
+iface <%= @bridge %> inet6 static
+  address <%= @settings[:ipv6][:address] %>
+  netmask <%= @settings[:ipv6][:netmask] %>
+<%- end %>
 # END_<%= @bridge %>  -- do not remove
 

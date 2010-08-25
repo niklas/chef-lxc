@@ -2,10 +2,13 @@ lxc.utsname = <%= @hostname %>
 lxc.tty = 4
 lxc.network.type = veth
 lxc.network.flags = up
-lxc.network.link = <%= @guest[:ipv4][:bridge] || 'vmbr0' %>
+lxc.network.link = <%= @guest[:bridge] || 'vmbr0' %>
 lxc.network.name = eth0
 lxc.network.mtu = 1500
-lxc.network.ipv4 = <%= @guest[:ipv4][:cidr] %>
+lxc.network.ipv4 = <%= @guest[:ipv4] %>
+<%- if @guest.has_key?(:ipv6) %>
+lxc.network.ipv6 = <%= @guest[:ipv6] %>
+<%- end %>
 lxc.rootfs = <%= @rootfs %>
 lxc.mount = <%= @home / 'fstab' %>
 lxc.cgroup.devices.deny = a

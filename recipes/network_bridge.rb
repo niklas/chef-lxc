@@ -9,7 +9,11 @@ package 'bridge-utils'
 file '/etc/sysctl.d/33-ip-forward.conf' do
   backup false
   action :create
-  content "net.ipv4.ip_forward=1\n"
+  content <<-EOSYS
+net.ipv4.ip_forward=1
+net.ipv6.conf.all.forwarding=1
+net.ipv6.conf.all.proxy_ndp=1
+  EOSYS
 end
 
 #TODO just notify
@@ -47,7 +51,15 @@ if node.attribute?('bridges')
       EOSH
     end
 
+
   end
 end
 
-
+search(:virtual_machines, "host:#{node['fqdn']}").each do |machine|
+  if machine.has_key?('ipv6')
+    address = machine['ipv6'].sub(%r~/.*$~, '') # remove netmask
+    execute "add #{machine['id']} to ipv6 neighborhood" do
+      command %Q~ip -6 neigh add proxy #{address} dev eth0~
+    end
+  end
+end
