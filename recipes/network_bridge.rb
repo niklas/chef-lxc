@@ -53,6 +53,12 @@ if node.attribute?('bridges')
 
 
   end
+
+  template '/etc/network/if-up.d/nat-for-bridges' do
+    source 'if-up-nat.erb'
+    action :create
+    mode '0755'
+  end
 end
 
 search(:virtual_machines, "host:#{node['fqdn']}").each do |machine|
