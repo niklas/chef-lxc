@@ -13,8 +13,13 @@ rm /etc/default/chef-client
 apt-get -y install chef
 
 # ubuntu's rubygems install in a path that is normally not in the PATH
-echo 'PATH=$PATH:/var/lib/gems/1.8/bin' >> /etc/default/chef-client
+cat > /etc/default/chef-client <<'EOCHEF'
+LOGFILE=/var/log/chef/client.log
+CONFIG=/etc/chef/client.rb
+INTERVAL=1800
+SPLAY=20
+PATH=$PATH:/var/lib/gems/1.8/bin
+EOCHEF
 
 chef-client
-chef-client
-
+start chef-client
