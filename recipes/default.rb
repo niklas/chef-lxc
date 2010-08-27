@@ -23,6 +23,7 @@ package 'inotify-tools'
 
 include_recipe 'lxc::manage'
 include_recipe 'lxc::network_bridge'
+include_recipe 'lxc::dns'
 
 host = node[:container]
 

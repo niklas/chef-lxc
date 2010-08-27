@@ -1,0 +1,12 @@
+; BEGIN hosts defined in the chef databag 'virtual_machines'
+
+<%- @hosts.each do |host| %>
+<%- if host[:ipv4] && (host[:ipv4].to_s !~ /^192/) %>
+<%= host[:id] %>    A     <%= host[:ipv4].sub(%r~/.+$~, '') %>
+<%- end %>
+<%- if host[:ipv6] %>
+<%= host[:id] %>    AAAA  <%= host[:ipv6].sub(%r~/.+$~, '') %>
+<%- end %>
+<%- end %>
+
+; END hosts defined in the chef databag 'virtual_machines'
