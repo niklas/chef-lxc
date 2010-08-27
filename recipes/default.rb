@@ -86,6 +86,13 @@ template '/usr/bin/lxc-status-all' do
   group 'root'
 end
 
+template '/usr/bin/lxc-kill-all' do
+  source 'tools/lxc-kill-all.erb'
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
 template '/etc/init/lxc.conf' do
   source 'init-lxc.conf.erb'
   mode '0644'

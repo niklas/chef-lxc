@@ -1,0 +1,10 @@
+#! /bin/bash
+# lxc-stop-all
+# Stop all containers violently.
+# please run this only if no machine is responding or their state is frakked up
+
+lxc-ps -C init -opid |while read VM PID ;do
+        [[ $PID -gt 1 ]] || continue
+        echo -n " $VM"
+        lxc-stop -n $VM
+done
